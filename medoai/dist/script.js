@@ -1,31 +1,44 @@
+// Set up objects to serialize to JSON later
+var currentAnnot = {
+    annotationID: null, lowerRight: null,
+    upperLeft: null, type: null
+};
+var outputFormat = { imageName: null, annotations: [] };
+// Get document element refrences to set up listeners
 var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext('2d');
 var radio1 = document.getElementById("intrstng");
 var radio2 = document.getElementById("!intrstng");
+var input = document.getElementById("file_input");
+// Set up variables to keep track of canvas state
+var isMouseDown = false;
+var isImageInserted = false;
 var canvasImage;
-let firstCorner;
-let currentAnnot = { annotationID: null, lowerRight: null, upperLeft: null, type: null };
-let outputFormat = { imageName: null, annotations: [] };
-let isMouseDown = false;
-let isImageInserted = false;
 currentAnnot.type = (radio1.checked) ? "Interesting" : "Uninteresting";
 ctx.textAlign = "center";
 ctx.strokeText("Insert Image Here", 200, 200);
+// Add event listeners
 radio1.addEventListener("change", radioChangeListener);
 radio2.addEventListener("change", radioChangeListener);
-function radioChangeListener() {
-    currentAnnot.type = (radio1.checked) ? "Interesting" : "Uninteresting";
-}
+canvas.addEventListener("click", callInputClickListener);
+// Serialize and print to screen
 document.getElementById("jsonbutton").addEventListener("click", function () {
-    document.getElementById("jsonoutput").innerHTML = JSON.stringify(outputFormat);
+    document.getElementById("jsonoutput").innerHTML =
+        JSON.stringify(outputFormat);
 });
-canvas.addEventListener("click", handleImage);
-document.getElementById("file_input").addEventListener("change", function (env) {
+/*
+ * onChange listener for file_input element
+ *      Handles loading local image and displaying it on canvas
+ *      Sets up mouse listeners for bounding box drawing
+ *
+ */
+input.addEventListener("change", function (env) {
     let files = env.target.files;
     if (files.length == 0) {
         return;
     }
     let file = files[0];
+    // Make sure file is image
     if (file.type !== '' && !file.type.match('image.*')) {
         return;
     }
@@ -37,19 +50,39 @@ document.getElementById("file_input").addEventListener("change", function (env) 
         canvas.width = canvasImage.width;
         canvas.height = canvasImage.height;
         ctx.drawImage(canvasImage, 0, 0);
-        canvas.removeEventListener("click", handleImage);
+        canvas.removeEventListener("click", callInputClickListener);
         canvas.addEventListener("mousedown", canvasMouseDown);
         canvas.addEventListener("mouseup", canvasMouseUp);
         canvas.addEventListener("mousemove", canvasMouseMove);
     };
 });
-function handleImage(e) {
-    document.getElementById("file_input").click();
+function callInputClickListener() { input.click(); }
+/*
+ * radioChangeListener
+ *      Keeps track of current marking type
+ *
+ */
+function radioChangeListener() {
+    currentAnnot.type = (radio1.checked) ? "Interesting" : "Uninteresting";
 }
+/*
+ * canvasMouseDown
+ *      Handles drawing bounding boxes
+ *
+ * Parameters:
+ *      env: Event object of the Event trigger
+ */
 function canvasMouseDown(env) {
     isMouseDown = true;
     currentAnnot.upperLeft = getMousePosition(env);
 }
+/*
+ * canvasMouseMove
+ *      Handles drawing bounding boxes
+ *
+ * Parameters:
+ *      env: Event object of the Event trigger
+ */
 function canvasMouseMove(env) {
     if (isMouseDown) {
         currentAnnot.lowerRight = getMousePosition(env);
@@ -57,6 +90,13 @@ function canvasMouseMove(env) {
         drawRectangle(currentAnnot);
     }
 }
+/*
+ * canvasMouseUp
+ *      Handles drawing bounding boxes
+ *
+ * Parameters:
+ *      env: Event object of the Event trigger
+ */
 function canvasMouseUp(env) {
     if (isMouseDown) {
         isMouseDown = false;
@@ -69,6 +109,13 @@ function canvasMouseUp(env) {
         drawAllAnnotations(outputFormat.annotations);
     }
 }
+/*
+ * getMousePosition
+ *      Returns a Point object specifying the current location of mouse pointer
+ *
+ * Parameters:
+ *      env: Event object of the Event trigger
+ */
 function getMousePosition(env) {
     let boundary = canvas.getBoundingClientRect();
     let x = Math.round(env.clientX - boundary.left);
@@ -79,12 +126,37 @@ function getMousePosition(env) {
         y: y
     };
 }
+/*
+ * getPointiD
+ *      Returns a unique string ID for the given point parameters
+ *
+ * Parameters:
+ *      x: Point.x Number
+ *      y: Point.y Number
+ */
 function getPointID(x, y) {
     return Number((x * 10000) + y).toString();
 }
+/*
+ * getAnnotationID
+ *      Returns a unique string ID for the given annotation parameters
+ *
+ * Parameters:
+ *      corner1: Annotation.upperLeft Point
+ *      corner2: Annotation.lowerRight Point
+ *      type: Annotation.type
+ */
 function getAnnotationID(corner1, corner2, type) {
     return type.charAt(0) + Number(Number(corner1.pointID) + (100000000 * Number(corner2.pointID))).toString();
 }
+/*
+ * drawRectangle
+ *      Helper function to draw a bounding box for a given annotation.
+ *      Draws green boxes for interesting annotation, red for uninteresting.
+ *
+ * Parameters:
+ *      annot: Annotation
+ */
 function drawRectangle(annot) {
     if (annot.type == "Interesting") {
         ctx.strokeStyle = "green";
@@ -96,12 +168,18 @@ function drawRectangle(annot) {
     let corner2 = annot.lowerRight;
     ctx.strokeRect(Math.min(corner1.x, corner2.x), Math.min(corner1.y, corner2.y), Math.abs(corner1.x - corner2.x), Math.abs(corner1.y - corner2.y));
 }
+/*
+ * drawAllAnnotations
+ *      Given an array of Annotations, draws bounding boxes for all annotations
+ *      on the canvas
+ *
+ * Parameters:
+ *      annot: Array of Annotation type objects
+ */
 function drawAllAnnotations(annot) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(canvasImage, 0, 0);
-    console.log("Size: " + annot.length);
     for (let i = 0; i < annot.length; ++i) {
-        console.log("Point " + i + " (" + annot[i].lowerRight.x + "," + annot[i].lowerRight.y + "), (" + annot[i].upperLeft.x, "," + annot[i].upperLeft.y + ")");
         drawRectangle(annot[i]);
     }
 }
