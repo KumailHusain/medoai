@@ -1,23 +1,16 @@
 from selenium import webdriver
-from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 
 driver = webdriver.Chrome()
-driver.get("file:///C:/Users/Kumail%20Husain/source/repos/medoai/tests/index.htm")
-test5div = driver.find_element_by_id("test5")
-WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located((By.TAG_NAME, "button"))
-    )
-button = test5div.find_element_by_tag_name("button")
+driver.get("https://medo.ai/career/test-challenge/index.html")
+test5div = driver.find_element_by_id("test-5-div")
+
+# 10 seconds is a reasonable timeout. If we don't want a timeout,
+# we can simply wait in a loop
+WebDriverWait(driver, 10).until(lambda x: x.find_element_by_id("test5-button").is_displayed())
+button = driver.find_element_by_id("test5-button")
 button.click()
 
-WebDriverWait(driver, 10).until(
-        EC.alert_is_present()    )
-isAlertPresent = True
-try:
-    driver.switch_to_alert()
-except:
-    isAlertPresent = False
-assert isAlertPresent    
+isVisible = WebDriverWait(driver, 5).until(lambda x: x.find_element_by_id("test-5-alert").is_displayed())
+assert isVisible
 assert not button.is_enabled()

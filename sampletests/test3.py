@@ -1,9 +1,12 @@
 from selenium import webdriver
-from selenium.webdriver.support.ui import Select
 
 driver = webdriver.Chrome()
-driver.get("file:///C:/Users/Kumail%20Husain/source/repos/medoai/tests/index.htm")
-test3div = driver.find_element_by_id("test3")
-select = Select(test3div.find_element_by_tag_name("select"))
-assert "Option 1" == select.first_selected_option.text
-select.select_by_visible_text("Option 3")
+driver.get("https://medo.ai/career/test-challenge/index.html")
+test3div = driver.find_element_by_id("test-3-div")
+button = test3div.find_element_by_id("dropdownMenuButton")
+assert button.text == "Option 1"
+options = test3div.find_elements_by_class_name("dropdown-item")
+for option in options:
+    if option.text == "Option 3":
+        option.click()
+        break
