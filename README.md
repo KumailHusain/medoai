@@ -8,7 +8,7 @@
 - Instructions on how to install and run the two solutions are in [medoai/README.md](https://github.com/KumailHusain/medoai/blob/master/medoai/README.md) and [medoailib/README.md](https://github.com/KumailHusain/medoai/blob/master/medoailib/README.md)
 
 ## Part 2: Simple UI/UX testing test
-- The sample scripts are located in the [samplescripts](https://github.com/KumailHusain/medoai/blob/master/samplescripts) directory
+- The sample scripts are located in the [samplestests](https://github.com/KumailHusain/medoai/blob/master/sampletests) directory
 
 
 This technical test was completed by Kumail Husain (shusain@ualberta.ca) without any collaboration.
