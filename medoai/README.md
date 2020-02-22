@@ -1,6 +1,12 @@
 # Simple Image Annotation Tool
 
 ## Instructions
+Make sure you have cloned the repository and you're inside the `medoai/medoai` directory:
+
+```bash
+git clone https://github.com/KumailHusain/medoai.git
+cd medoai/medoai
+```
 If you haven't already, install the typescript package:
 
 ```bash
