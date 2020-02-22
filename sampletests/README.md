@@ -10,6 +10,6 @@ The sample scripts are written in Python 3 and use Selenium WebDriver. Each `tes
 # Running the scripts
 To test the x-th script, issue the following command:
 
-'''bash
+```bash
 python3 testx.py
-'''
+```
