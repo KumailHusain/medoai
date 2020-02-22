@@ -1,10 +1,10 @@
 {
-  "name": "medoai",
+  "name": "medoalib",
   "version": "0.0.0",
-  "description": "",
+  "description": "medoailib",
   "main": "dist/script.js",
   "author": {
-    "name": "Kumail Husain"
+    "name": ""
   },
   "scripts": {
     "build": "tsc --build",
@@ -14,5 +14,10 @@
     "@types/node": "^8.0.14",
     "typescript": "^3.2.2"
   },
-  "dependencies": {}
+  "dependencies": {
+    "awesome-typescript-loader": "^5.2.1",
+    "ts-simplecanvas": "^1.0.1",
+    "webpack": "^4.41.6",
+    "webpack-cli": "^3.3.11"
+  }
 }

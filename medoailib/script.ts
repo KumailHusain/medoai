@@ -1,3 +1,5 @@
+import SimpleCanvas from "ts-simplecanvas/src/index";
+
 // Define type definitions mentioned in specification
 type Point = {
     pointID: string,
@@ -23,27 +25,24 @@ var currentAnnot: Annotation = {
 };
 var outputFormat: DesiredOutputFormat = { imageName: null, annotations: [] };
 
-
 // Get document element refrences to set up listeners
-var canvas = document.getElementById("canvas") as HTMLCanvasElement;
-var ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+var imgcanvas = new SimpleCanvas("canvas");
 var radio1 = document.getElementById("intrstng") as HTMLInputElement;
 var radio2 = document.getElementById("!intrstng") as HTMLInputElement;
 var input = document.getElementById("file_input") as HTMLInputElement;
 
 // Set up variables to keep track of canvas state
 var isMouseDown = false;
-var isImageInserted = false;
-var canvasImage;
+var canvasImage = {"img": null, "width": null, "height": null};
 
 currentAnnot.type = (radio1.checked) ? "Interesting" : "Uninteresting";
-ctx.textAlign = "center";
-ctx.strokeText("Insert Image Here", 200, 200);
+imgcanvas.context.textAlign = "center";
+imgcanvas.context.strokeText("Insert Image Here", 200, 200);
 
 // Add event listeners
 radio1.addEventListener("change", radioChangeListener);
 radio2.addEventListener("change", radioChangeListener);
-canvas.addEventListener("click", callInputClickListener);
+imgcanvas.canvas.addEventListener("click", callInputClickListener);
 
 // Serialize and print to screen
 document.getElementById("jsonbutton").addEventListener("click", function () {
@@ -69,16 +68,18 @@ input.addEventListener("change", function (env) {
         return;
     }
     outputFormat.imageName = file.name;
-    canvasImage = new Image();
-    canvasImage.src = URL.createObjectURL(file);
-    canvasImage.onload = () => {
-        canvas.width = canvasImage.width;
-        canvas.height = canvasImage.height;
-        ctx.drawImage(canvasImage, 0, 0);
-        canvas.removeEventListener("click", callInputClickListener);
-        canvas.addEventListener("mousedown", canvasMouseDown);
-        canvas.addEventListener("mouseup", canvasMouseUp);
-        canvas.addEventListener("mousemove", canvasMouseMove);
+    canvasImage["URL"] = URL.createObjectURL(file);
+    let img = new Image();
+    img.src = canvasImage["URL"];
+    img.onload = () => {
+        canvasImage["img"] = img;
+        canvasImage["width"] = img.width;
+        canvasImage["height"] = img.height;
+        drawImageOnCanvas();
+        imgcanvas.canvas.removeEventListener("click", callInputClickListener);
+        imgcanvas.canvas.addEventListener("mousedown", canvasMouseDown);
+        imgcanvas.canvas.addEventListener("mouseup", canvasMouseUp);
+        imgcanvas.canvas.addEventListener("mousemove", canvasMouseMove);
     }
 });
 
@@ -131,13 +132,14 @@ function canvasMouseUp(env) {
         isMouseDown = false;
         currentAnnot.lowerRight = getMousePosition(env);
         if (currentAnnot.lowerRight.pointID === currentAnnot.upperLeft.pointID) {
+            // Don't save boxes with 0 content
             return;
         }
         currentAnnot.annotationID = getAnnotationID(currentAnnot.upperLeft,
             currentAnnot.lowerRight, currentAnnot.type);
         outputFormat.annotations.push(Object.assign({}, currentAnnot));
         drawAllAnnotations(outputFormat.annotations);
-        
+
     }
 }
 
@@ -148,8 +150,8 @@ function canvasMouseUp(env) {
  * Parameters:
  *      env: Event object of the Event trigger
  */
-function getMousePosition(env):Point {
-    let boundary = canvas.getBoundingClientRect();
+function getMousePosition(env): Point {
+    let boundary = imgcanvas.canvas.getBoundingClientRect();
     let x: number = Math.round(env.clientX - boundary.left);
     let y: number = Math.round(env.clientY - boundary.top);
     return {
@@ -183,7 +185,13 @@ function getPointID(x: number, y: number): string {
 function getAnnotationID(corner1: Point, corner2: Point, type: "Interesting" | "Uninteresting"): string {
     return type.charAt(0) +
         Number(Number(corner1.pointID) +
-        (100000000 * Number(corner2.pointID))).toString();
+            (100000000 * Number(corner2.pointID))).toString();
+}
+
+function drawImageOnCanvas(): void {
+    imgcanvas.canvas.width = canvasImage["width"];
+    imgcanvas.canvas.height = canvasImage["height"];
+    imgcanvas.context.drawImage(canvasImage["img"], 0, 0)
 }
 
 /* 
@@ -195,17 +203,19 @@ function getAnnotationID(corner1: Point, corner2: Point, type: "Interesting" | "
  *      annot: Annotation
  */
 function drawRectangle(annot: Annotation): void {
-    if (annot.type == "Interesting") {
-        ctx.strokeStyle = "green";
-    } else {
-        ctx.strokeStyle = "red";
-    }
     let corner1 = annot.upperLeft;
     let corner2 = annot.lowerRight;
-    ctx.strokeRect(Math.min(corner1.x, corner2.x),
-        Math.min(corner1.y, corner2.y),
-        Math.abs(corner1.x - corner2.x),
-        Math.abs(corner1.y - corner2.y));
+    if (annot.type == "Interesting") {
+        imgcanvas.drawRect(Math.min(corner1.x, corner2.x),
+            Math.min(corner1.y, corner2.y),
+            Math.abs(corner1.x - corner2.x),
+            Math.abs(corner1.y - corner2.y), "green");
+    } else {
+        imgcanvas.drawRect(Math.min(corner1.x, corner2.x),
+            Math.min(corner1.y, corner2.y),
+            Math.abs(corner1.x - corner2.x),
+            Math.abs(corner1.y - corner2.y), "red");
+    }
 }
 /*
  * drawAllAnnotations
@@ -216,8 +226,7 @@ function drawRectangle(annot: Annotation): void {
  *      annot: Array of Annotation type objects
  */
 function drawAllAnnotations(annot: Annotation[]): void {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(canvasImage, 0, 0);
+    drawImageOnCanvas();
     for (let i: number = 0; i < annot.length; ++i) {
         drawRectangle(annot[i]);
     }

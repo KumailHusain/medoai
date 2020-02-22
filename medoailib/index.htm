@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Sample Website</title>
+	</head>
+
+	<body>
+		<div style="text-align:center;margin-top:40px">
+			<div style="display:inline-block">
+				<div>
+					<input type="radio" id="intrstng" name="marking" value="intrstng"
+						   checked>
+					<label for="intrstng">Interesting</label>
+					<input type="radio" id="!intrstng" name="marking" value="!intrstng"
+						   checked>
+					<label for="!intrstng">Not Interesting</label>
+				</div>
+				<br />
+				
+				<canvas id="canvas" width="400" height="400" style="border: 1px solid black;"></canvas>
+				<br />
+				<div>
+					<input type="file" id="file_input" style="display:none" />
+					<button id="jsonbutton" type="button">JSON Output</button>
+				</div>
+				<br />
+				<p id="jsonoutput" width="400"></p>
+			</div>
+		</div>
+		
+		
+		<script src="dist/bundle.js"></script>
+	</body>
+</html>
+

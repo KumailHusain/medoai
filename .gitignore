@@ -341,3 +341,8 @@ healthchecksdb
 /medoai/medoai.njsproj
 /medoai.sln
 /medoai/medoai.sln
+/tests
+/sampletests/sampletests.pyproj
+/medoailib/dist
+/medoailib/medoailib.njsproj
+/medoailib/medoailib.sln

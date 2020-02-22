@@ -34,6 +34,7 @@ document.getElementById("jsonbutton").addEventListener("click", function () {
  */
 input.addEventListener("change", function (env) {
     let files = env.target.files;
+    // https://webplatform.github.io/docs/concepts/programming/drawing_images_onto_canvas/
     if (files.length == 0) {
         return;
     }
@@ -45,7 +46,6 @@ input.addEventListener("change", function (env) {
     outputFormat.imageName = file.name;
     canvasImage = new Image();
     canvasImage.src = URL.createObjectURL(file);
-    ;
     canvasImage.onload = () => {
         canvas.width = canvasImage.width;
         canvas.height = canvasImage.height;
@@ -147,7 +147,9 @@ function getPointID(x, y) {
  *      type: Annotation.type
  */
 function getAnnotationID(corner1, corner2, type) {
-    return type.charAt(0) + Number(Number(corner1.pointID) + (100000000 * Number(corner2.pointID))).toString();
+    return type.charAt(0) +
+        Number(Number(corner1.pointID) +
+            (100000000 * Number(corner2.pointID))).toString();
 }
 /*
  * drawRectangle
