@@ -1,4 +1,5 @@
-from selenium import webdriver
+import browser
+driver = browser.getDriver()
 
 def getCellValue(tbody, x, y):
     rows = tbody.find_elements_by_tag_name("tr")
@@ -7,8 +8,6 @@ def getCellValue(tbody, x, y):
     assert len(cells) >= x + 1
     return cells[x].text
 
-
-driver = webdriver.Chrome()
 driver.get("https://medo.ai/career/test-challenge/index.html")
 test6div = driver.find_element_by_id("test-6-div")
 tbody = test6div.find_element_by_tag_name("tbody")

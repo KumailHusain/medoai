@@ -1,7 +1,7 @@
-from selenium import webdriver
+import browser
 from selenium.webdriver.support.ui import WebDriverWait
+driver = browser.getDriver()
 
-driver = webdriver.Chrome()
 driver.get("https://medo.ai/career/test-challenge/index.html")
 test5div = driver.find_element_by_id("test-5-div")
 
