@@ -19,7 +19,7 @@ Compile the typescript script using the compiler:
 tsc
 ```
 
-Use the webpack module loader to bundle all js files together:\
+Use the webpack module loader to bundle all js files together:
 ```bash
 npx webpack
 ```
