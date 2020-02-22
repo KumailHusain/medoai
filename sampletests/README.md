@@ -18,3 +18,9 @@ To test the x-th script, issue the following command:
 ```bash
 python3 testx.py
 ```
+
+Example (Running test 5):
+
+```bash
+python3 test5.py
+```
