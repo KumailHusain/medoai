@@ -1,7 +1,7 @@
 # Simple Image Annotation Tool
 
 ## Instructions
-If you haven`t already, install the typescript package:\
+If you haven't already, install the typescript package:\
 `npm install -g typescript`\
 Install the npm dependencies for this project:\
 `npm install`\
